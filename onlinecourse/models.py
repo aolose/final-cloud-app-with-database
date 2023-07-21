@@ -49,7 +49,7 @@ class Learner(models.Model):
 
     def __str__(self):
         return self.user.username + "," + \
-               self.occupation
+            self.occupation
 
 
 # Course model
@@ -65,7 +65,7 @@ class Course(models.Model):
 
     def __str__(self):
         return "Name: " + self.name + "," + \
-               "Description: " + self.description
+            "Description: " + self.description
 
 
 # Lesson model
@@ -96,39 +96,50 @@ class Enrollment(models.Model):
 
 
 # <HINT> Create a Question Model with:
-    # Used to persist question content for a course
-    # Has a One-To-Many (or Many-To-Many if you want to reuse questions) relationship with course
-    # Has a grade point for each question
-    # Has question content
-    # Other fields and methods you would like to design
-#class Question(models.Model):
-    # Foreign key to lesson
+# Used to persist question content for a course
+# Has a One-To-Many (or Many-To-Many if you want to reuse questions) relationship with course
+# Has a grade point for each question
+# Has question content
+# Other fields and methods you would like to design
+class Question(models.Model):
     # question text
     # question grade/mark
+    # choice_set = models.ForeignKey(Choice)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, default="")
+    question_text = models.CharField(max_length=100, default="enter question text here")
+    grade = models.IntegerField(default=10)
+    lesson_id = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+
 
     # <HINT> A sample model method to calculate if learner get the score of the question
-    #def is_get_score(self, selected_ids):
-    #    all_answers = self.choice_set.filter(is_correct=True).count()
-    #    selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids).count()
-    #    if all_answers == selected_correct:
-    #        return True
-    #    else:
-    #        return False
+    def is_get_score(self, selected_ids):
+        all_answers = self.choice_set.filter(is_correct=True).count()
+        selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids).count()
+        if all_answers == selected_correct:
+            return True
+        else:
+            return False
 
 
 #  <HINT> Create a Choice Model with:
-    # Used to persist choice content for a question
-    # One-To-Many (or Many-To-Many if you want to reuse choices) relationship with Question
-    # Choice content
-    # Indicate if this choice of the question is a correct one or not
-    # Other fields and methods you would like to design
-# class Choice(models.Model):
+# Used to persist choice content for a question
+# One-To-Many (or Many-To-Many if you want to reuse choices) relationship with Question
+# Choice content
+# Indicate if this choice of the question is a correct one or not
+# Other fields and methods you would like to design
+class Choice(models.Model):
+    choice_text = models.CharField(max_length=100, default="Enter choice text here")
+    is_correct = models.BooleanField(default=False)
+    question_id = models.ForeignKey(Question, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.choice_text
+
 
 # <HINT> The submission model
 # One enrollment could have multiple submission
 # One submission could have multiple choices
 # One choice could belong to multiple submissions
-#class Submission(models.Model):
-#    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
-#    choices = models.ManyToManyField(Choice)
+class Submission(models.Model):
+    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
+    choices = models.ManyToManyField(Choice)
 #    Other fields and methods you would like to design
